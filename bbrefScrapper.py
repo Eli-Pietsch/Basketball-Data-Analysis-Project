@@ -1,6 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
+import os
+
 URL = 'https://www.basketball-reference.com/teams/DAL/2024.html'
 
 def get_cols(table):
@@ -17,6 +19,7 @@ def get_data(table):
         parsed.append(parsed_row)
     return parsed
 
+
 def main():
     data = requests.get(URL)
     data.content
@@ -26,17 +29,23 @@ def main():
     tables = parsed_html.findAll('div', {'class': 'table_wrapper'})
 
     dfs = []
-    for tabllll in tables:
+    for i, tabllll in enumerate(tables):
         try:
             cols = get_cols(tabllll)
             data = get_data(tabllll)
-
-            dfs.append(pd.DataFrame(data, columns=cols))
+            df = pd.DataFrame(data, columns=cols)
+            dfs.append(df)
         except:
             print('error')
+    folder_path = "name_of_path"
+    
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
 
-    for df in dfs:
-        print(df)
+    for i, df in enumerate(dfs):
+        file_path = os.path.join(folder_path, f'table_{i+1}.xlsx')
+        df.to_excel(file_path, index=False)
+        print("table saved")
 
 if __name__ == '__main__':
     main()
