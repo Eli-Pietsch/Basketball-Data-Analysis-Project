@@ -32,6 +32,11 @@ directory_path = "file-path"
 def uploadSql(path):
     try: 
         file = pd.read_excel(path, header=None)
+
+        file.columns = file.iloc[0]
+        file = file[1:]
+        print(file)
+        
         tableName = os.path.splitext(os.path.basename(path))[0]
         file.to_sql(name=tableName, con=tableEngine, if_exists='replace', index=False)
         print(f"Data from {path} inserted into table {tableName}.")
